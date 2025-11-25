@@ -1,46 +1,28 @@
-using System.Collections;
-using System.Collections.Generic;
+// HandleLook.cs
 using UnityEngine;
 
 public class HandleLook : MonoBehaviour
 {
-    [SerializeField] private Transform head;
-    [SerializeField] private Transform player;
+    public Transform player;
+    public Transform head;
+    public float lookSpeed = 2f;
+    private float xRotation = 0f;
+
     void Start()
     {
-        // Locks mouse cursor in the center of the screen and hides it
-        Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
-        
+        Cursor.visible = false;
     }
 
     void Update()
     {
-        player.transform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * 2);
-    }
+        float mouseX = Input.GetAxis("Mouse X") * lookSpeed;
+        float mouseY = Input.GetAxis("Mouse Y") * lookSpeed;
 
-    void LateUpdate() 
-    {
-        // Vertical rotation
-        Vector3 e = head.eulerAngles;
-        e.x -= Input.GetAxis("Mouse Y") * 2f;   //  Edit the multiplier to adjust the rotate speed
-        e.x = RestrictAngle(e.x, -85f, 85f);    //  This is clamped to 85 degrees
-        head.eulerAngles = e;
-    }
+        player.Rotate(Vector3.up * mouseX);
 
-    //  Clamp the vertical head rotation (prevent bending backwards)
-    public static float RestrictAngle(float angle, float angleMin, float angleMax) 
-    {
-        if (angle > 180)
-            angle -= 360;
-        else if (angle < -180)
-            angle += 360;
-
-        if (angle > angleMax)
-            angle = angleMax;
-        if (angle < angleMin)
-            angle = angleMin;
-
-        return angle;
+        xRotation -= mouseY;
+        xRotation = Mathf.Clamp(xRotation, -85f, 85f);
+        head.localRotation = Quaternion.Euler(xRotation, 0, 0);
     }
 }
